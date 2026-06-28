@@ -44,7 +44,12 @@ function VideoTile({ participant, source, isPinned, onTogglePin, trackPub }: { p
         const isReady = participant.isLocal || videoPub.isSubscribed
         if (isReady) {
           videoTrack = videoPub.track
-          if (videoRef.current) videoTrack.attach(videoRef.current)
+          if (videoRef.current) {
+            videoRef.current.muted = true
+            videoRef.current.playsInline = true
+            videoTrack.attach(videoRef.current)
+            videoRef.current.play().catch((e: any) => console.warn("video play error:", e))
+          }
           setVideoEnabled(!videoPub.isMuted)
         } else {
           setVideoEnabled(false)
@@ -60,7 +65,10 @@ function VideoTile({ participant, source, isPinned, onTogglePin, trackPub }: { p
         ) as any
         if (audioPub && audioPub.track && audioPub.isSubscribed) {
           audioTrack = audioPub.track
-          if (audioRef.current) audioTrack.attach(audioRef.current)
+          if (audioRef.current) {
+            audioTrack.attach(audioRef.current)
+            audioRef.current.play().catch((e: any) => console.warn("audio play error:", e))
+          }
           setAudioMuted(audioPub.isMuted)
         }
       }
@@ -218,7 +226,12 @@ export default function RoomPage({ params }: RoomPageProps) {
       try {
         const track = await createLocalVideoTrack()
         setPreviewVideoTrack(track)
-        if (previewVideoRef.current) track.attach(previewVideoRef.current)
+        if (previewVideoRef.current) {
+          previewVideoRef.current.muted = true
+          previewVideoRef.current.playsInline = true
+          track.attach(previewVideoRef.current)
+          previewVideoRef.current.play().catch(() => {})
+        }
       } catch (err) {
         setIsVideoOff(true)
       }
