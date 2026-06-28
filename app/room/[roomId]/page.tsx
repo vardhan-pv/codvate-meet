@@ -8,7 +8,7 @@ import { meetingService } from '@/services/meeting'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Mic, MicOff, Video, VideoOff, PhoneOff, Users, MessageSquare, MonitorUp, ShieldAlert, X, Maximize2, Minimize2, Subtitles } from 'lucide-react'
+import { Mic, MicOff, Video, VideoOff, PhoneOff, Users, MessageSquare, MonitorUp, ShieldAlert, X, Maximize2, Minimize2, Subtitles, Expand, Shrink } from 'lucide-react'
 
 interface RoomPageProps {
   params: Promise<{
@@ -28,8 +28,33 @@ const getDisplayName = (identity: string) => {
 function VideoTile({ participant, source, isPinned, onTogglePin, trackPub }: { participant: any, source: 'camera' | 'screen_share', isPinned: boolean, onTogglePin: () => void, trackPub: any }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const audioRef = useRef<HTMLAudioElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const [videoEnabled, setVideoEnabled] = useState(false)
   const [audioMuted, setAudioMuted] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+
+  const toggleFullscreen = async () => {
+    if (!containerRef.current) return
+    try {
+      if (!document.fullscreenElement) {
+        await containerRef.current.requestFullscreen()
+      } else {
+        await document.exitFullscreen()
+      }
+    } catch (err) {
+      console.error("Fullscreen error:", err)
+    }
+  }
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(document.fullscreenElement === containerRef.current)
+    }
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange)
+    }
+  }, [])
 
   useEffect(() => {
     let videoTrack: any = null
@@ -103,7 +128,10 @@ function VideoTile({ participant, source, isPinned, onTogglePin, trackPub }: { p
   if (source === 'screen_share' && !videoEnabled) return null
 
   return (
-    <div className={`relative bg-slate-900 border border-slate-800 rounded-xl overflow-hidden flex items-center justify-center shadow-lg group ${isPinned ? 'w-full h-full' : 'w-full aspect-video'}`}>
+    <div 
+      ref={containerRef}
+      className={`relative bg-slate-900 overflow-hidden flex items-center justify-center shadow-lg group ${isFullscreen ? 'w-screen h-screen rounded-none border-none' : `border border-slate-800 rounded-xl ${isPinned ? 'w-full h-full' : 'w-full aspect-video'}`}`}
+    >
       <video 
         ref={videoRef} 
         autoPlay 
@@ -148,9 +176,12 @@ function VideoTile({ participant, source, isPinned, onTogglePin, trackPub }: { p
         )}
       </div>
 
-      {/* Pin Button */}
-      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-        <Button size="icon" variant="secondary" className="h-8 w-8 bg-black/60 hover:bg-black/80 text-white border-none backdrop-blur-xs" onClick={onTogglePin}>
+      {/* Action Buttons (Pin & Fullscreen) */}
+      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex gap-2">
+        <Button size="icon" variant="secondary" className="h-8 w-8 bg-black/60 hover:bg-black/80 text-white border-none backdrop-blur-xs" onClick={toggleFullscreen} title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
+          {isFullscreen ? <Shrink className="h-4 w-4" /> : <Expand className="h-4 w-4" />}
+        </Button>
+        <Button size="icon" variant="secondary" className="h-8 w-8 bg-black/60 hover:bg-black/80 text-white border-none backdrop-blur-xs" onClick={onTogglePin} title={isPinned ? "Unpin Tile" : "Pin Tile"}>
           {isPinned ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
         </Button>
       </div>
