@@ -25,7 +25,7 @@ const getDisplayName = (identity: string) => {
   return identity
 }
 
-function VideoTile({ participant, source, isPinned, onTogglePin }: { participant: any, source: 'camera' | 'screen_share', isPinned: boolean, onTogglePin: () => void }) {
+function VideoTile({ participant, source, isPinned, onTogglePin, trackPub }: { participant: any, source: 'camera' | 'screen_share', isPinned: boolean, onTogglePin: () => void, trackPub: any }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const audioRef = useRef<HTMLAudioElement>(null)
   const [videoEnabled, setVideoEnabled] = useState(false)
@@ -36,7 +36,7 @@ function VideoTile({ participant, source, isPinned, onTogglePin }: { participant
     let audioTrack: any = null
 
     const attachTracks = () => {
-      const videoPub = Array.from(participant.trackPublications.values()).find(
+      const videoPub = trackPub || Array.from(participant.trackPublications.values()).find(
         (pub: any) => pub.source === source || (source === 'camera' && pub.kind === 'video' && pub.source !== 'screen_share')
       ) as any
 
@@ -89,7 +89,7 @@ function VideoTile({ participant, source, isPinned, onTogglePin }: { participant
       participant.off('localTrackPublished', attachTracks)
       participant.off('localTrackUnpublished', attachTracks)
     }
-  }, [participant, source])
+  }, [participant, source, trackPub, trackPub?.track, trackPub?.isSubscribed])
 
   // Don't render a screen share tile if it's not enabled
   if (source === 'screen_share' && !videoEnabled) return null
@@ -494,14 +494,19 @@ export default function RoomPage({ params }: RoomPageProps) {
   }
 
   // Create flat list of all active tiles (Camera and Screen Shares are separate tiles now)
-  const activeTiles: { participant: any, source: 'camera' | 'screen_share', id: string }[] = []
+  const activeTiles: { participant: any, source: 'camera' | 'screen_share', id: string, trackPub: any }[] = []
   participants.forEach(p => {
     const pid = p.sid || p.identity
-    activeTiles.push({ participant: p, source: 'camera', id: `${pid}:camera` })
+    const cameraPub = Array.from(p.trackPublications.values()).find(
+      (pub: any) => pub.source === 'camera' || (pub.kind === 'video' && pub.source !== 'screen_share')
+    )
+    activeTiles.push({ participant: p, source: 'camera', id: `${pid}:camera`, trackPub: cameraPub })
     
-    const hasScreen = Array.from(p.trackPublications.values()).some((pub: any) => pub.source === 'screen_share')
-    if (hasScreen) {
-      activeTiles.push({ participant: p, source: 'screen_share', id: `${pid}:screen_share` })
+    const screenPub = Array.from(p.trackPublications.values()).find(
+      (pub: any) => pub.source === 'screen_share'
+    )
+    if (screenPub) {
+      activeTiles.push({ participant: p, source: 'screen_share', id: `${pid}:screen_share`, trackPub: screenPub })
     }
   })
 
@@ -592,6 +597,7 @@ export default function RoomPage({ params }: RoomPageProps) {
                       source={pinnedTile.source} 
                       isPinned={true} 
                       onTogglePin={() => setPinnedId(null)} 
+                      trackPub={pinnedTile.trackPub}
                     />
                   </div>
                   {unpinnedTiles.length > 0 && (
@@ -603,6 +609,7 @@ export default function RoomPage({ params }: RoomPageProps) {
                             source={tile.source} 
                             isPinned={false} 
                             onTogglePin={() => setPinnedId(tile.id)} 
+                            trackPub={tile.trackPub}
                           />
                         </div>
                       ))}
@@ -623,6 +630,7 @@ export default function RoomPage({ params }: RoomPageProps) {
                       source={tile.source} 
                       isPinned={false} 
                       onTogglePin={() => setPinnedId(tile.id)} 
+                      trackPub={tile.trackPub}
                     />
                   ))}
                 </div>
