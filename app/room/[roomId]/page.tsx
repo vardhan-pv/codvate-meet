@@ -133,11 +133,19 @@ function VideoTile({ participant, source, isPinned, onTogglePin, trackPub }: { p
       {!participant.isLocal && source === 'camera' && <audio ref={audioRef} autoPlay />}
       
       {/* Overlay Information */}
-      <div className="absolute bottom-3 left-3 bg-black/60 px-3 py-1 rounded-md text-xs font-semibold backdrop-blur-xs flex items-center gap-1.5 text-white z-10">
-        <span>{getDisplayName(participant.identity)}</span>
-        {participant.isLocal && <span className="text-[10px] uppercase font-bold text-primary">(You)</span>}
-        {source === 'screen_share' && <span className="text-[10px] uppercase font-bold text-blue-400 border border-blue-400/50 px-1 rounded">Screen</span>}
-        {audioMuted && source === 'camera' && <MicOff className="h-3 w-3 text-red-500 ml-1" />}
+      <div className="absolute bottom-3 left-3 bg-black/60 px-3 py-1 rounded-md text-xs font-semibold backdrop-blur-xs flex flex-col gap-0.5 text-white z-10">
+        <div className="flex items-center gap-1.5">
+          <span>{getDisplayName(participant.identity)}</span>
+          {participant.isLocal && <span className="text-[10px] uppercase font-bold text-primary">(You)</span>}
+          {source === 'screen_share' && <span className="text-[10px] uppercase font-bold text-blue-400 border border-blue-400/50 px-1 rounded">Screen</span>}
+          {audioMuted && source === 'camera' && <MicOff className="h-3 w-3 text-red-500 ml-1" />}
+        </div>
+        {/* Diagnostic info to show subscription state */}
+        {source === 'screen_share' && (
+          <span className="text-[8px] text-gray-400 font-mono tracking-tighter leading-none mt-0.5">
+            pub:{trackPub ? 'Y' : 'N'} | sub:{trackPub?.isSubscribed ? 'Y' : 'N'} | trk:{trackPub?.track ? 'Y' : 'N'} | en:{videoEnabled ? 'Y' : 'N'}
+          </span>
+        )}
       </div>
 
       {/* Pin Button */}
@@ -299,7 +307,13 @@ export default function RoomPage({ params }: RoomPageProps) {
     if (!token || !hasJoined) return
 
     setStatusText('Connecting to video server...')
-    const activeRoom = new Room({ adaptiveStream: true, dynacast: true })
+    const activeRoom = new Room({
+      adaptiveStream: false,
+      dynacast: false,
+      publishDefaults: {
+        videoCodec: 'vp8'
+      }
+    })
 
     const updateParticipantList = () => {
       setParticipants([
