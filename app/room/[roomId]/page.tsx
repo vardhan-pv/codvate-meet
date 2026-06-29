@@ -2006,95 +2006,11 @@ export default function RoomPage({ params }: RoomPageProps) {
                       sendData('FILTER_CHANGE', { filter: f.value })
                       setParticipantFilters(prev => ({ ...prev, [room?.localParticipant.sid || 'local']: f.value }))
                     }}
-                    className={`p-2 text-[10px] rounded-xl font-bold border transition ${localVideoFilter === f.value ? 'bg-primary text-white border-primary' : 'bg-slate-850 border-slate-800 text-slate-300 hover:bg-slate-805'}`}
+                    className={`p-2 text-[10px] rounded-xl font-bold border transition ${localVideoFilter === f.value ? 'bg-primary text-white border-primary' : 'bg-slate-850 border-slate-800 text-slate-300 hover:bg-slate-800'}`}
                   >
                     {f.name}
                   </button>
                 ))}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider select-none">AI Virtual Backgrounds</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {['Blur Background', 'Strong Blur', 'Minimal Office', 'Cozy Bedroom', 'Space Hub', 'Cyber City'].map(bg => (
-                  <button
-                    key={bg}
-                    onClick={() => alert(`Applied Virtual Background: ${bg}`)}
-                    className="p-2 text-[10px] rounded-xl border bg-slate-855 border-slate-800 text-slate-300 hover:bg-slate-800 text-left"
-                  >
-                    🌅 {bg}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )
-      case 'dev':
-        return (
-          <div className="flex flex-col h-full p-4 space-y-4 overflow-y-auto bg-slate-900/50">
-            {/* Visual Gauges */}
-            <div className="space-y-3">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 select-none">
-                <Activity className="h-4 w-4 text-primary animate-pulse" /> Host Dev Resource Stats
-              </h3>
-              <div className="space-y-2.5 bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
-                <div className="space-y-1">
-                  <div className="flex justify-between text-xs font-semibold select-none">
-                    <span className="text-slate-300">CPU Usage</span>
-                    <span className="text-primary font-bold">{cpuUsage}%</span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden border border-slate-850">
-                    <div className="bg-primary h-full transition-all duration-500" style={{ width: `${cpuUsage}%` }} />
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex justify-between text-xs font-semibold select-none">
-                    <span className="text-slate-300">RAM Usage</span>
-                    <span className="text-emerald-400 font-bold">{ramUsage}%</span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden border border-slate-850">
-                    <div className="bg-emerald-500 h-full transition-all duration-500" style={{ width: `${ramUsage}%` }} />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Docker containers controller */}
-            <div className="space-y-2">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 select-none">
-                <Terminal className="h-4 w-4 text-emerald-400" /> Docker Containers
-              </h3>
-              <div className="space-y-2">
-                {containers.map((cont, i) => (
-                  <div key={cont.name} className="flex justify-between items-center p-2 rounded-xl bg-slate-900 border border-slate-850">
-                    <div>
-                      <p className="text-xs font-bold text-white leading-none">{cont.name}</p>
-                      <p className="text-[9px] text-slate-400 mt-1 font-mono">{cont.port} | <span className={cont.status === 'running' ? 'text-emerald-400' : 'text-red-400'}>{cont.status}</span></p>
-                    </div>
-                    <Button
-                      onClick={() => toggleContainer(i)}
-                      className={`h-7 px-2.5 text-[9px] font-extrabold border-none ${cont.status === 'running' ? 'bg-red-950 text-red-200 hover:bg-red-900' : 'bg-emerald-950 text-emerald-200 hover:bg-emerald-900'}`}
-                    >
-                      {cont.status === 'running' ? 'Stop' : 'Start'}
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Git Integration & PM */}
-            <div className="space-y-2">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 select-none">
-                <Activity className="h-4 w-4 text-indigo-400" /> PM Jira & GitHub Exports
-              </h3>
-              <div className="flex gap-2 select-none">
-                <Button onClick={() => alert("Jira Tickets successfully generated for all extracted action items.")} variant="outline" className="flex-1 text-[10px] h-8 font-semibold border-slate-800 hover:bg-slate-800">
-                  Export Jira
-                </Button>
-                <Button onClick={() => alert("GitHub Issues opened in workspace repository.")} variant="outline" className="flex-1 text-[10px] h-8 font-semibold border-slate-800 hover:bg-slate-800">
-                  Export Git Issues
-                </Button>
               </div>
             </div>
           </div>
@@ -2428,7 +2344,6 @@ export default function RoomPage({ params }: RoomPageProps) {
             <option value="chat">💬 Chat</option>
             <option value="participants">👥 Participants ({participants.length})</option>
             <option value="ai">✨ AI Notes</option>
-            <option value="dev">⚡ Dev Panel</option>
             <option value="timetravel">⏰ Timeline</option>
             <option value="focus">⏱️ Focus</option>
             <option value="interview">👑 Interview</option>
@@ -2444,9 +2359,6 @@ export default function RoomPage({ params }: RoomPageProps) {
             </Button>
             <Button variant="ghost" onClick={() => setActiveSidebar(activeSidebar === 'ai' ? null : 'ai')} className={`h-8 text-xs font-semibold hover:bg-slate-800 ${activeSidebar === 'ai' ? 'bg-primary hover:bg-primary/95 text-white' : 'text-slate-300'}`}>
               <Sparkles className="h-4 w-4 mr-1 text-amber-400 animate-pulse" /> AI Notes
-            </Button>
-            <Button variant="ghost" onClick={() => setActiveSidebar(activeSidebar === 'dev' ? null : 'dev')} className={`h-8 text-xs font-semibold hover:bg-slate-800 ${activeSidebar === 'dev' ? 'bg-primary hover:bg-primary/95 text-white' : 'text-slate-300'}`}>
-              <Activity className="h-4 w-4 mr-1 text-primary animate-pulse" /> Dev Panel
             </Button>
             <Button variant="ghost" onClick={() => setActiveSidebar(activeSidebar === 'timetravel' ? null : 'timetravel')} className={`h-8 text-xs font-semibold hover:bg-slate-800 ${activeSidebar === 'timetravel' ? 'bg-primary hover:bg-primary/95 text-white' : 'text-slate-300'}`}>
               <Clock className="h-4 w-4 mr-1 text-sky-400" /> Timeline
@@ -2633,7 +2545,6 @@ export default function RoomPage({ params }: RoomPageProps) {
                 {activeSidebar === 'chat' ? 'In-Call Messages' :
                  activeSidebar === 'participants' ? 'Meeting Participants' :
                  activeSidebar === 'ai' ? 'Codovate Assistant' :
-                 activeSidebar === 'dev' ? 'Developer Dashboard' :
                  activeSidebar === 'timetravel' ? 'AI Time Travel' :
                  activeSidebar === 'focus' ? 'Co-working & Pomodoro' :
                  activeSidebar === 'interview' ? 'Technical Interview' : activeSidebar}
@@ -2644,12 +2555,11 @@ export default function RoomPage({ params }: RoomPageProps) {
             </div>
             
             {/* Quick switcher inside sidebar */}
-            <div className="grid grid-cols-5 border-b border-slate-850 bg-slate-900/40 p-1">
+            <div className="grid grid-cols-4 border-b border-slate-850 bg-slate-900/40 p-1">
               {[
                 { tab: 'chat', label: 'Chat', icon: <MessageSquare className="h-3.5 w-3.5" /> },
                 { tab: 'participants', label: 'Users', icon: <Users className="h-3.5 w-3.5" /> },
                 { tab: 'ai', label: 'AI', icon: <Sparkles className="h-3.5 w-3.5" /> },
-                { tab: 'dev', label: 'Dev', icon: <Activity className="h-3.5 w-3.5" /> },
                 { tab: 'timetravel', label: 'Timeline', icon: <Clock className="h-3.5 w-3.5" /> }
               ].map(item => (
                 <button
