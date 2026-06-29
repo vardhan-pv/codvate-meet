@@ -23,6 +23,32 @@ async function initDB() {
         );
       `)
 
+      // Add new security columns to users table
+      await client.query(`
+        ALTER TABLE users 
+        ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT FALSE,
+        ADD COLUMN IF NOT EXISTS verification_code VARCHAR(255) DEFAULT NULL,
+        ADD COLUMN IF NOT EXISTS login_attempts INTEGER DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP DEFAULT NULL,
+        ADD COLUMN IF NOT EXISTS reset_token VARCHAR(255) DEFAULT NULL,
+        ADD COLUMN IF NOT EXISTS reset_expires TIMESTAMP DEFAULT NULL,
+        ADD COLUMN IF NOT EXISTS mfa_enabled BOOLEAN DEFAULT FALSE,
+        ADD COLUMN IF NOT EXISTS mfa_secret VARCHAR(255) DEFAULT NULL,
+        ADD COLUMN IF NOT EXISTS role VARCHAR(255) DEFAULT 'user';
+      `)
+
+      // Create Security Logs table
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS security_logs (
+          id VARCHAR(255) PRIMARY KEY,
+          event_type VARCHAR(255) NOT NULL,
+          user_id VARCHAR(255) REFERENCES users(id) ON DELETE CASCADE,
+          ip_address VARCHAR(255) DEFAULT '127.0.0.1',
+          details TEXT DEFAULT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `)
+
       // Create Meetings table
       await client.query(`
         CREATE TABLE IF NOT EXISTS meetings (

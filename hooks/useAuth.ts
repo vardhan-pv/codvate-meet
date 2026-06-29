@@ -5,6 +5,9 @@ interface User {
   id: string
   name: string
   email: string
+  is_verified?: boolean
+  mfa_enabled?: boolean
+  role?: string
 }
 
 interface AuthState {
@@ -13,12 +16,12 @@ interface AuthState {
   loading: boolean
   error: string | null
   login: (email: string, password: string) => Promise<boolean>
-  register: (name: string, email: string, password: string) => Promise<boolean>
+  register: (name: string, email: string, password: string) => Promise<any>
   logout: () => void
   loadProfile: () => Promise<void>
 }
 
-export const useAuth = create<AuthState>((set) => ({
+export const useAuth = create<AuthState>((set, get) => ({
   token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
   user: null,
   loading: false,
@@ -34,21 +37,20 @@ export const useAuth = create<AuthState>((set) => ({
     } catch (err: any) {
       const msg = err.response?.data?.error || 'Invalid credentials'
       set({ error: msg, loading: false })
-      return false
+      throw err
     }
   },
 
   register: async (name, email, password) => {
     set({ loading: true, error: null })
     try {
-      await authService.register(name, email, password)
-      // Auto login after registration
-      const success = await useAuth.getState().login(email, password)
-      return success
+      const data = await authService.register(name, email, password)
+      set({ loading: false })
+      return data
     } catch (err: any) {
       const msg = err.response?.data?.error || 'Registration failed'
       set({ error: msg, loading: false })
-      return false
+      throw err
     }
   },
 

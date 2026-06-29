@@ -14,22 +14,22 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
-  const register = useAuth((state) => state.register)
+  const { register } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setFormError(null)
     try {
-      const success = await register(name, email, password)
-      if (success) {
-        window.location.href = '/dashboard'
+      const data = await register(name, email, password)
+      if (data && data.id) {
+        window.location.href = `/login?userId=${data.id}&email=${encodeURIComponent(data.email)}&registered=true`
       } else {
         setFormError('Registration failed. Email might already be in use.')
         setIsLoading(false)
       }
-    } catch {
-      setFormError('An unexpected error occurred. Please try again.')
+    } catch (err: any) {
+      setFormError(err.response?.data?.error || 'An unexpected error occurred. Please try again.')
       setIsLoading(false)
     }
   }

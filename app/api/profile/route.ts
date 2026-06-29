@@ -17,7 +17,7 @@ export async function GET(request: Request) {
     }
 
     // Optional: verify user still exists in DB
-    const res = await query('SELECT id, name, email FROM users WHERE id = $1', [decoded.id])
+    const res = await query('SELECT id, name, email, is_verified, mfa_enabled, role FROM users WHERE id = $1', [decoded.id])
     if (res.rows.length === 0) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
