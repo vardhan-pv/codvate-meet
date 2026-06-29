@@ -2443,7 +2443,7 @@ export default function RoomPage({ params }: RoomPageProps) {
       </header>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden relative">
         
         {/* Workspaces & Grid Pane */}
         <main className="flex-1 flex flex-col md:flex-row p-4 overflow-hidden relative bg-slate-950 gap-4">
@@ -2579,7 +2579,7 @@ export default function RoomPage({ params }: RoomPageProps) {
 
         {/* Unified Tabbed Sidebar Panel */}
         {activeSidebar && (
-          <aside className="w-80 bg-slate-900 border-l border-slate-855 flex flex-col shrink-0 animate-in slide-in-from-right-8 duration-200 animate-out">
+          <aside className="absolute md:static right-0 top-0 bottom-0 z-20 h-full w-full md:w-80 bg-slate-900 border-l border-slate-855 flex flex-col shrink-0 animate-in slide-in-from-right-8 duration-200 animate-out">
             <div className="p-3.5 border-b border-slate-850 flex justify-between items-center bg-slate-900">
               <h2 className="font-extrabold text-sm text-white select-none capitalize">
                 {activeSidebar === 'chat' ? 'In-Call Messages' :
