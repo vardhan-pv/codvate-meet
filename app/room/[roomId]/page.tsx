@@ -2743,6 +2743,17 @@ export default function RoomPage({ params }: RoomPageProps) {
           <span>⚠️</span> {shareError}
         </div>
       )}
+
+      {typeof window !== 'undefined' && !window.isSecureContext && (
+        <div className="absolute top-16 left-6 right-6 bg-amber-500/20 border border-amber-500/40 text-amber-300 p-4 rounded-xl text-xs z-35 flex flex-col gap-1.5 select-none shadow-xl">
+          <div className="flex items-center gap-1.5 font-bold text-amber-400">
+            <span>⚠️</span> Non-Secure Connection (HTTP)
+          </div>
+          <p className="opacity-95 leading-normal">
+            Your browser blocks camera, microphone, and screen sharing access on non-secure connections. Please connect via **localhost** or deploy to an **HTTPS** URL (such as your Vercel deployment) to test these features!
+          </p>
+        </div>
+      )}
     </div>
   )
 }
