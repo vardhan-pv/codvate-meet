@@ -1814,13 +1814,20 @@ export default function RoomPage({ params }: RoomPageProps) {
                   displayedText = mapped.join('') + ' (Translated)'
                 }
 
+                const isMe = msg.sender === lobbyName
                 return (
-                  <div key={i} className="space-y-1">
+                  <div key={i} className={`flex flex-col space-y-1 ${isMe ? 'items-end' : 'items-start'}`}>
                     <div className="flex items-baseline gap-2">
-                      <span className="font-bold text-sm text-primary">{msg.sender}</span>
-                      <span className="text-[10px] text-muted-foreground">{new Date(msg.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                      <span className={`font-bold text-xs ${isMe ? 'text-blue-400' : 'text-primary'}`}>{msg.sender}</span>
+                      <span className="text-[9px] text-slate-400">{new Date(msg.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                     </div>
-                    <p className="text-sm bg-slate-900 inline-block px-3 py-2 rounded-lg text-foreground border border-border">{displayedText}</p>
+                    <p className={`text-xs inline-block px-3 py-1.5 rounded-xl max-w-[85%] break-words shadow-sm ${
+                      isMe 
+                        ? 'bg-blue-600 text-white rounded-tr-none' 
+                        : 'bg-white text-slate-900 rounded-tl-none border border-slate-200'
+                    }`}>
+                      {displayedText}
+                    </p>
                   </div>
                 )
               })}
@@ -2724,7 +2731,7 @@ export default function RoomPage({ params }: RoomPageProps) {
 
           {/* Mobile Leave actions */}
           <div className="flex md:hidden gap-1.5">
-            <Button onClick={handleLeaveCall} variant="outline" className="h-9 px-3 rounded-lg border-white/10 bg-white/5 text-slate-300 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-300 hover:scale-105 active:scale-95 select-none text-xs">
+            <Button onClick={handleLeaveCall} className="h-9 px-3.5 rounded-lg bg-gradient-to-r from-red-500 to-rose-600 border-none text-white font-bold text-xs select-none shadow-md shadow-red-500/10 hover:opacity-90 active:scale-95 transition-all duration-300">
               Leave
             </Button>
             {user && user.id === meetingHostId && (
@@ -2835,7 +2842,7 @@ export default function RoomPage({ params }: RoomPageProps) {
           </div>
 
           <div className="flex gap-2">
-            <Button onClick={handleLeaveCall} variant="outline" className="h-10 sm:h-11 px-3 sm:px-4 rounded-full border-white/10 bg-white/5 text-slate-300 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-300 hover:scale-105 active:scale-95 select-none font-bold text-xs">
+            <Button onClick={handleLeaveCall} className="h-10 sm:h-11 px-5 rounded-full bg-gradient-to-r from-red-500 to-rose-600 border-none text-white font-bold text-xs select-none shadow-md shadow-red-500/10 hover:opacity-90 active:scale-95 transition-all duration-300">
               Leave
             </Button>
             {user && user.id === meetingHostId && (
